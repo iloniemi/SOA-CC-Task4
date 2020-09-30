@@ -1,0 +1,68 @@
+{
+  "customers": [
+    {
+      "id": "1",
+      "firstName": "Roope",
+      "lastName": "Ankka",
+      "orders": [
+        {
+          "id": "1",
+          "deliveryAddress": "Rahasailiotie 22"
+        },
+        {
+          "id": "2",
+          "deliveryAddress": "Ankkakartanontie 4"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "firstName": "Aku",
+      "lastName": "Ankka",
+      "orders": [
+        {
+          "id": "1",
+          "deliveryAddress": "Paratiisitie 13"
+        }
+      ]
+    }
+  ],
+  "productCategories": [
+    {
+      "id": "1",
+      "name": "rods",
+      "products": [
+        {
+          "id": "1",
+          "name": "Spintube Pro",
+          "manufacturer": "Mikado",
+          "availability": 44
+        },
+        {
+          "id": "2",
+          "name": "Ambidex Trekker",
+          "manufacturer": "Patriot",
+          "availability": 23
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "lures",
+      "products": [
+        {
+          "id": "1",
+          "name": "Husky Jerk 10",
+          "manufacturer": "Rapala",
+          "availability": 42
+        },
+        {
+          "id": "2",
+          "name": "Gear 4D River Roach",
+          "manufacturer": "Savage",
+          "availability": 12
+        }
+      ]
+    }
+  ]
+}
