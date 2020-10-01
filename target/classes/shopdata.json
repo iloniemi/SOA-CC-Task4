@@ -1,4 +1,27 @@
 {
+  "users": [
+    {
+      "id": "adminUser",
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@webshoprest.com",
+      "roles": [
+        "admin",
+        "user",
+        "quest"
+      ]
+    },
+    {
+      "id": "basicUser",
+      "firstName": "Basic",
+      "lastName": "User",
+      "email": "user@webshoprest.com",
+      "roles": [
+        "user",
+        "quest"
+      ]
+    }
+  ],
   "customers": [
     {
       "id": "1",
