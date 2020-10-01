@@ -5,6 +5,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import types.ErrorMessage;
+
 @Provider
 public class HandlingExceptionMapper implements ExceptionMapper<HandlingException> {
 

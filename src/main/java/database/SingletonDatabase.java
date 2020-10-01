@@ -15,6 +15,7 @@ import types.ProductCategory;
 import types.ShopData;
 import webshopREST.errors.DataNotFoundException;
 import webshopREST.errors.HandlingException;
+import webshopREST.errors.InvalidInputException;
 
 /**
  * Reads the JSON-file and acts as a dumb database for the web shop Other
@@ -467,14 +468,24 @@ public class SingletonDatabase {
 	 * @param user user object to be added
 	 * @return Added user object (or null if there was an error)
 	 */
-	public User addUser(User user) {
-		if (savedUsers == null) {
-			throw new HandlingException("Could not get user data");
+	public User addUser(User userAdded) {
+		User existingUser = savedUsers.stream().filter(user -> user.getId().equals(userAdded.getId())).findFirst().orElse(null);
+		
+		// if user with specified id doesn't exists yet
+		if (existingUser == null) {
+			if (DatabaseHelpers.isValidID(userAdded.getId())) {
+				if (savedUsers == null) {
+					throw new HandlingException("Could not get user data");
+				} else {
+					savedUsers.add(userAdded);
+					return userAdded;
+				}
+			} else {
+				throw new InvalidInputException("User ID is invalid");
+			}
 		} else {
-			savedUsers.add(user);
-			return user;
+			throw new InvalidInputException("User with given ID exists already");
 		}
-
 	}
 
 	/**
@@ -489,7 +500,7 @@ public class SingletonDatabase {
 		if (user == null) {
 			throw new DataNotFoundException("User with id " + userId + " not found");
 		} else {
-			// id remains unchanged
+			if (newUser.getId() != null) throw new InvalidInputException("User ID cannot be changed");
 			if (newUser.getPassword() != null) user.setPassword(newUser.getPassword());
 			if (newUser.getFirstName() != null) user.setFirstName(newUser.getFirstName());
 			if (newUser.getLastName() != null) user.setLastName(newUser.getLastName());

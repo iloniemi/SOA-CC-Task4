@@ -9,15 +9,15 @@ import javax.ws.rs.ext.Provider;
 import types.ErrorMessage;
 
 @Provider
-public class DataNotFoundExceptionMapper implements ExceptionMapper<DataNotFoundException> {
+public class InvalidInputExceptionMapper implements ExceptionMapper<InvalidInputException> {
 
-	public DataNotFoundExceptionMapper() {
+	public InvalidInputExceptionMapper() {
 	}
 	
 	@Override
-	public Response toResponse(DataNotFoundException exception) {
+	public Response toResponse(InvalidInputException exception) {
 		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(),404,"http://myDocs.org");
-		return Response.status(Status.NOT_FOUND).entity(errorMessage).build();
+		return Response.status(Status.BAD_REQUEST).entity(errorMessage).build();
 	}
 
 }
