@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import types.User;
 import types.Customer;
 import types.Order;
 import types.Product;
@@ -22,6 +23,7 @@ import webshopREST.errors.HandlingException;
  * SingletonDatabase.getDatabase().GetProductCategories()
  */
 public class SingletonDatabase {
+	private List<User> savedUsers;
 	private List<Customer> savedCustomers;
 	private List<ProductCategory> savedProductCategories;
 
@@ -37,15 +39,23 @@ public class SingletonDatabase {
 
 				ShopData shopData = mapper.readValue(is, ShopData.class);
 
+				savedUsers = shopData.getUsers();
 				savedCustomers = shopData.getCustomers();
 				savedProductCategories = shopData.getProductCategories();
 			} catch (Exception e) {
 				e.printStackTrace();
+				savedUsers = null;
+				savedCustomers = null;
 				savedProductCategories = null;
 			}
 
 			// TODO: kovakoodauksen näissä silmukoissa voisi vaihtaa esim.
 			// config-tiedostosta luettavaan arvoon tai staattiseen muuttujaan
+			for (int i = 0; i < savedUsers.size(); i++) {
+				User u = savedUsers.get(i);
+				u.addLink("/webshopREST/webapi/users/" + u.getId(), "self");
+			}
+			
 			for (int i = 0; i < savedProductCategories.size(); i++) {
 				ProductCategory pc = savedProductCategories.get(i);
 				pc.addLink("/webshopREST/webapi/productcategories/" + pc.getId(),                               "self");
@@ -137,10 +147,10 @@ public class SingletonDatabase {
 			throw new DataNotFoundException("Category with id " + categoryId + " not found");
 		}
 
-		category.setName(newCategory.getName());
+		if (newCategory.getName() != null) category.setName(newCategory.getName());
 
 		// Products replaced only if there are new products
-		if (!newCategory.getProducts().isEmpty()) {
+		if (newCategory.getProducts() != null && !newCategory.getProducts().isEmpty()) {
 			category.setProducts(newCategory.getProducts());
 		}
 
@@ -297,7 +307,7 @@ public class SingletonDatabase {
 	}
 
 	/**
-	 * Replaces customer info, if new orders are empty, old ones will be used
+	 * Replaces customer info, if field is empty, old value will be used
 	 * 
 	 * @param customerId  id to be replaced
 	 * @param newCustomer customer to be replaced by
@@ -308,11 +318,11 @@ public class SingletonDatabase {
 		if (customer == null) {
 			throw new DataNotFoundException("customer with id " + customerId + " not found");
 		} else {
-			customer.setFirstName(newCustomer.getFirstName());
-			customer.setLastName(newCustomer.getLastName());
+			if (newCustomer.getFirstName() != null) customer.setFirstName(newCustomer.getFirstName());
+			if (newCustomer.getLastName() != null) customer.setLastName(newCustomer.getLastName());
 
 			// if new customer info does not contain new orders old ones will not change
-			if (!newCustomer.getOrders().isEmpty()) {
+			if (newCustomer.getOrders() != null && !newCustomer.getOrders().isEmpty()) {
 				customer.setOrders(newCustomer.getOrders());
 			}
 
@@ -420,4 +430,92 @@ public class SingletonDatabase {
 		int a = 1 + 1;
 	}
 	*/
+	
+	// ------User--------------------------
+
+	/**
+	 * @return list of users
+	 */
+	public List<User> getUsers() {
+		if (savedUsers == null) {
+			throw new HandlingException("Could not get users");
+		}
+		return savedUsers;
+	}
+
+	/**
+	 * 
+	 * @param userId id to find
+	 * @return user with userId, null if not found (or if there was an
+	 *         error)
+	 */
+	public User getUser(String userId) {
+		if (savedUsers == null) {
+			throw new HandlingException("Could not get user data");
+		}
+
+		User foundUser = savedUsers.stream().filter(user -> user.getId().equals(userId)).findFirst()
+				.orElse(null);
+		if (foundUser == null) {
+			throw new DataNotFoundException("User with id " + userId + " not found");
+		}
+		return foundUser;
+	}
+
+	/**
+	 * 
+	 * @param user user object to be added
+	 * @return Added user object (or null if there was an error)
+	 */
+	public User addUser(User user) {
+		if (savedUsers == null) {
+			throw new HandlingException("Could not get user data");
+		} else {
+			savedUsers.add(user);
+			return user;
+		}
+
+	}
+
+	/**
+	 * Replaces user info, id remains always unchanged. If some field is empty, old value will be used
+	 * 
+	 * @param userId id to be replaced
+	 * @param newUser user to be replaced by
+	 * @return replaced user, null if not found (or if there was an error)
+	 */
+	public User replaceUser(String userId, User newUser) {
+		User user = this.getUser(userId);
+		if (user == null) {
+			throw new DataNotFoundException("User with id " + userId + " not found");
+		} else {
+			// id remains unchanged
+			if (newUser.getPassword() != null) user.setPassword(newUser.getPassword());
+			if (newUser.getFirstName() != null) user.setFirstName(newUser.getFirstName());
+			if (newUser.getLastName() != null) user.setLastName(newUser.getLastName());
+			if (newUser.getEmail() != null) user.setEmail(newUser.getEmail());
+
+			// if new customer info does not contain new orders old ones will not change
+			if (newUser.getRoles() != null && !newUser.getRoles().isEmpty()) {
+				user.setRoles(newUser.getRoles());
+			}
+
+			return user;
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param userId id to be removed
+	 * @return removed true if found and succeed
+	 */
+	public boolean removeUser(String userId) {
+		if (savedUsers == null) {
+			throw new HandlingException("Could not get user data");
+		} else {
+			return savedUsers.removeIf(user -> user.getId().equals(userId));
+		}
+
+	}
 }

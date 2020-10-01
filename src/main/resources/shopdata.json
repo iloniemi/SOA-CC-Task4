@@ -2,23 +2,23 @@
   "users": [
     {
       "id": "adminUser",
+      "password": "pass",
       "firstName": "Admin",
       "lastName": "User",
       "email": "admin@webshoprest.com",
       "roles": [
-        "admin",
-        "user",
-        "quest"
+        "ADMIN",
+        "USER"
       ]
     },
     {
       "id": "basicUser",
+      "password": "pass",
       "firstName": "Basic",
       "lastName": "User",
       "email": "user@webshoprest.com",
       "roles": [
-        "user",
-        "quest"
+        "USER"
       ]
     }
   ],
