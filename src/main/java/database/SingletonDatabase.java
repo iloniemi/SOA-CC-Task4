@@ -447,8 +447,7 @@ public class SingletonDatabase {
 	/**
 	 * 
 	 * @param userId id to find
-	 * @return user with userId, null if not found (or if there was an
-	 *         error)
+	 * @return user with userId
 	 */
 	public User getUser(String userId) {
 		if (savedUsers == null) {
@@ -466,7 +465,7 @@ public class SingletonDatabase {
 	/**
 	 * 
 	 * @param user user object to be added
-	 * @return Added user object (or null if there was an error)
+	 * @return Added user object
 	 */
 	public User addUser(User userAdded) {
 		User existingUser = savedUsers.stream().filter(user -> user.getId().equals(userAdded.getId())).findFirst().orElse(null);
@@ -481,10 +480,10 @@ public class SingletonDatabase {
 					return userAdded;
 				}
 			} else {
-				throw new InvalidInputException("User ID is invalid");
+				throw new InvalidInputException("User ID " + userAdded.getId() + " is invalid");
 			}
 		} else {
-			throw new InvalidInputException("User with given ID exists already");
+			throw new InvalidInputException("User with id " + userAdded.getId() + " exists already");
 		}
 	}
 
@@ -493,27 +492,23 @@ public class SingletonDatabase {
 	 * 
 	 * @param userId id to be replaced
 	 * @param newUser user to be replaced by
-	 * @return replaced user, null if not found (or if there was an error)
+	 * @return replaced user
 	 */
 	public User replaceUser(String userId, User newUser) {
 		User user = this.getUser(userId);
-		if (user == null) {
-			throw new DataNotFoundException("User with id " + userId + " not found");
-		} else {
-			if (newUser.getId() != null) throw new InvalidInputException("User ID cannot be changed");
-			if (newUser.getPassword() != null) user.setPassword(newUser.getPassword());
-			if (newUser.getFirstName() != null) user.setFirstName(newUser.getFirstName());
-			if (newUser.getLastName() != null) user.setLastName(newUser.getLastName());
-			if (newUser.getEmail() != null) user.setEmail(newUser.getEmail());
 
-			// if new customer info does not contain new orders old ones will not change
-			if (newUser.getRoles() != null && !newUser.getRoles().isEmpty()) {
-				user.setRoles(newUser.getRoles());
-			}
+		if (newUser.getId() != null) throw new InvalidInputException("User ID cannot be modified");
+		if (newUser.getPassword() != null) user.setPassword(newUser.getPassword());
+		if (newUser.getFirstName() != null) user.setFirstName(newUser.getFirstName());
+		if (newUser.getLastName() != null) user.setLastName(newUser.getLastName());
+		if (newUser.getEmail() != null) user.setEmail(newUser.getEmail());
 
-			return user;
+		// if new customer info does not contain new orders old ones will not change
+		if (newUser.getRoles() != null && !newUser.getRoles().isEmpty()) {
+			user.setRoles(newUser.getRoles());
 		}
 
+		return user;
 	}
 
 	/**
