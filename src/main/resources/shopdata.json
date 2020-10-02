@@ -7,8 +7,8 @@
       "lastName": "User",
       "email": "admin@webshoprest.com",
       "roles": [
-        "ADMIN",
-        "USER"
+        "admin",
+        "user"
       ]
     },
     {
@@ -18,7 +18,7 @@
       "lastName": "User",
       "email": "user@webshoprest.com",
       "roles": [
-        "USER"
+        "user"
       ]
     }
   ],

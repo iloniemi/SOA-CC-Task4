@@ -11,7 +11,13 @@
 - Käyttäjän Rooli käyttää `Role`-enumeraatiota, jonka arvoja on `ADMIN` tai `USER`.
   - Sen avulla avulla voidaan tulevaisuudessa testata oikeuksia ilman merkkijonoja tyyliin `if (user.getRoles().contains(Role.ADMIN))`
 - Käyttäjää ei voida luoda olemassa olevalla ID:llä, eikä virheellisellä IDllä. Käyttäjän ID:tä ei voida muuttaa käyttäjää muokatessa.
-  - Nämä kaikki virheviestit käyttävät `InvalidInputException`ia (BAD_REQUEST)
+  - Nämä kaikki virheviestit käyttävät uutta `InvalidInputException`ia (*BAD_REQUEST*)
+  
+#### 2.10. (Jukka)
+- Poistin `Role`-enumeraation ja muutin roolit vain Stringeiksi, vaikutti että niin on suoraviivaisempi tehdä authorisaatio.
+- En ehtinyt tehdä basic authia loppuun, siihen liittyen on luokat `WebshopREST.java`, `ContainerAuthFilter.java` ja `WebshopSecurityContext.java`.
+  - En ole varma onko tiedostojen sijainti oikea ja voisiko esim Resourcet siirtää vielä omaan `resources` packageen. Koitin tehdä sen ja `WebshopREST.java` luokassa rekisteröidä sen `package("resources")` mutta ei toiminut ainakaan niin simppelisti
+  - Löysin hyvän oloisia esimerkkiprojekteja https://github.com/jersey/jersey/tree/faa809da43538ce31076b50f969b4bd64caa5ac9/examples joista ainakin parissa oli käytetty tuota `register(RolesAllowedDynamicFeature.class);` (https://github.com/jersey/jersey/search?q=RolesAllowedDynamicFeature)
 
 ### Import
 

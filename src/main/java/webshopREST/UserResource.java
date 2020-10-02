@@ -2,6 +2,8 @@ package webshopREST;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,6 +23,7 @@ import types.User;
  * Root resource (exposed at "users" path)
  */
 @Path("/users")
+@PermitAll
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();
@@ -60,6 +63,7 @@ public class UserResource {
     }
     
     @DELETE
+    @RolesAllowed("admin")
     @Path("/{userId}")
     public Response removeUser(@PathParam("userId") String userId) {
     	if (database.removeUser(userId)) {

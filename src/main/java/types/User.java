@@ -1,24 +1,25 @@
 package types;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class User {	
+public class User implements Principal {	
 	private String id;
 	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
-	private List<Role> roles;
+	private List<String> roles;
 	private List<Link> links = new ArrayList<Link>();
 	
 
 	public User() {}
 	
-	public User(String id, String password, String firstName, String lastName, String email, List<Role> roles) {
+	public User(String id, String password, String firstName, String lastName, String email, List<String> roles) {
 		this.id = id;
 		this.password = password;
 		this.firstName = firstName;
@@ -47,7 +48,13 @@ public class User {
 	public void setLinks(List<Link> links) {
 		this.links = links;
 	}
-
+	
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return this.getId();
+	}
 	
 	/**
 	 * @return the id
@@ -112,13 +119,13 @@ public class User {
 	/**
 	 * @return the roles
 	 */
-	public List<Role> getRoles() {
+	public List<String> getRoles() {
 		return roles;
 	}
 	/**
 	 * @param roles the roles to set
 	 */
-	public void setRoles(List<Role> roles) {
+	public void setRoles(List<String> roles) {
 		this.roles = roles;
 	}
 }
