@@ -1,9 +1,12 @@
-package database;
+package webshopREST.database;
 
 import java.awt.print.Printable;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,6 +16,7 @@ import types.Order;
 import types.Product;
 import types.ProductCategory;
 import types.ShopData;
+import webshopREST.WebshopSecurityContext;
 import webshopREST.errors.DataNotFoundException;
 import webshopREST.errors.HandlingException;
 import webshopREST.errors.InvalidInputException;
@@ -29,6 +33,9 @@ public class SingletonDatabase {
 	private List<ProductCategory> savedProductCategories;
 
 	static SingletonDatabase obj = new SingletonDatabase();
+	
+	@Context
+	private WebshopSecurityContext securityContext;
 
 	private SingletonDatabase() {
 
@@ -450,16 +457,39 @@ public class SingletonDatabase {
 	 * @return user with userId
 	 */
 	public User getUser(String userId) {
-		if (savedUsers == null) {
-			throw new HandlingException("Could not get user data");
-		}
 
-		User foundUser = savedUsers.stream().filter(user -> user.getId().equals(userId)).findFirst()
+			if (savedUsers == null) {
+				System.out.print("savedusers on null");
+				throw new HandlingException("Could not get user data");
+			}
+
+			User foundUser = savedUsers.stream().filter(user -> user.getId().equals(userId)).findFirst()
 				.orElse(null);
+			if (foundUser == null) {
+				throw new DataNotFoundException("User with id " + userId + " not found");
+			}
+			return foundUser;
+	}
+	
+	public boolean userCredentialExists(String username, String password) {
+		System.out.println("päästiin credential checkiin");
+		User foundUser = savedUsers.stream().filter(user -> user.getId().equals(username)).findFirst()
+				.orElse(null);
+		
+		System.out.println("security: " + securityContext);
+		
+		System.out.println("löydetty user: " + foundUser);
 		if (foundUser == null) {
-			throw new DataNotFoundException("User with id " + userId + " not found");
+			throw new DataNotFoundException("User with username " + username + " not found");
 		}
-		return foundUser;
+		
+		String userPass = foundUser.getPassword();
+		if (password.contentEquals(userPass)) {
+			System.out.println("got to userCredentialsExists, found creds");
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**

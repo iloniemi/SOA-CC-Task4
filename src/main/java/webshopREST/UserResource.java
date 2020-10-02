@@ -2,6 +2,7 @@ package webshopREST;
 
 import java.util.List;
 
+import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -12,12 +13,15 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import database.SingletonDatabase;
 import types.User;
+import webshopREST.database.SingletonDatabase;
+import webshopREST.errors.DataNotFoundException;
+
 
 /**
  * Root resource (exposed at "users" path)
@@ -27,6 +31,8 @@ import types.User;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();
+	@Context
+	private WebshopSecurityContext securityContext;
 
     @GET
     public Response getUsers() {
@@ -36,9 +42,19 @@ public class UserResource {
     
     @GET
     @Path("/{userId}")
+    @RolesAllowed("admin")
     public Response getUser(@PathParam("userId") String userId) {
+    	System.out.println("getUser metodissa resourcessa");
+    	System.out.println("security " + securityContext);
+    	/* Ei toimi koska isUserRolea ei voi tehdä, securityContext on null
+    	 * Tämä GET-metodissa vain koska helppo testata
+    	if (!securityContext.isUserInRole("admin")){
+    		throw new DataNotFoundException("Not authorized");
+    		}
+    		*/
     	User user = database.getUser(userId);
 		return Response.status(Status.OK).entity(user).build();
+		
     }
     
     @POST
@@ -66,6 +82,12 @@ public class UserResource {
     @RolesAllowed("admin")
     @Path("/{userId}")
     public Response removeUser(@PathParam("userId") String userId) {
+    	// Ei toimi koska isUserRolea ei voi tehdä, securityContext on null
+    	System.out.println("resource security: " + securityContext);
+    	if (!securityContext.isUserInRole("admin")){
+    		throw new DataNotFoundException("Not authorized");
+    		}
+    		
     	if (database.removeUser(userId)) {
 			return Response.status(Status.OK).entity("{}").build();
     	}

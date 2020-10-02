@@ -14,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import database.SingletonDatabase;
 import types.Customer;
+import webshopREST.database.SingletonDatabase;
 
 /**
  * Root resource (exposed at "customers" path)

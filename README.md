@@ -19,6 +19,16 @@
   - En ole varma onko tiedostojen sijainti oikea ja voisiko esim Resourcet siirtää vielä omaan `resources` packageen. Koitin tehdä niin ja rekisteröidä `WebshopREST.java` luokassa sen tyyliin `package("resources")` mutta ei toiminut ainakaan niin simppelisti
   - Löysin hyvän oloisia esimerkkiprojekteja https://github.com/jersey/jersey/tree/faa809da43538ce31076b50f969b4bd64caa5ac9/examples joista ainakin parissa oli käytetty tuota `register(RolesAllowedDynamicFeature.class);` (https://github.com/jersey/jersey/search?q=RolesAllowedDynamicFeature)
 
+
+#### 2.10 Dorrit
+BasicAuth, mikä toimii:
+- Tunnistaa oikeita käyttäjänimiä ja salasanoja eli näyttää näillä käyttäjätietoja
+- Heittää poikkeuksen jos user&pass tyhjä tai väärin
+Mikä ei toimi:
+- Admin ja User tasojen tarkastus ei toimi, ohjelman pitäisi tarkistaa securityContextista taso, mutta securityContext injektio muissa luokissa ei toimi
+- Käyttäjä voi hakea kenen tahansa muun käyttäjän tiedot (kun securitycontext tarkastus poistetaan)
+
+
 ### Import
 
 Jos kloonaat projektin aiempaan Eclipe workspaceen, saat sen näkyviin Eclipsessä Importin avulla:

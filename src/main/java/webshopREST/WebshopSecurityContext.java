@@ -22,6 +22,7 @@ public class WebshopSecurityContext implements SecurityContext {
 	
 	@Override
 	public boolean isUserInRole(String role) {
+		System.out.println("ollaan isUserInRole, rooli " + role);
 		if (user.getRoles() != null) {
 			return user.getRoles().contains(role);
 		}

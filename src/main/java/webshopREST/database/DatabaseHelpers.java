@@ -1,4 +1,4 @@
-package database;
+package webshopREST.database;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
