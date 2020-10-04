@@ -2,6 +2,8 @@ package webshopREST;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,11 +23,13 @@ import webshopREST.database.SingletonDatabase;
 	 * Root resource (exposed at "customers" path)
 	 */
 	@Path("/productcategories")
+    @RolesAllowed("admin")
 	@Produces(MediaType.APPLICATION_JSON)
 	public class ProductCategoryResource {
 		SingletonDatabase database = SingletonDatabase.getDatabase();
 		
 	    @GET
+	    @PermitAll
 	    public Response getProductCategories() {
 	    	List<ProductCategory> productCategories = database.getProductCategories();
 	    	if (productCategories != null) {
@@ -35,6 +39,7 @@ import webshopREST.database.SingletonDatabase;
 	    }
 	    
 	    @GET
+	    @PermitAll
 	    @Path("/{categoryId}")
 	    public Response getCategory(@PathParam("categoryId") String categoryId) {
 	    	ProductCategory category = database.getCategory(categoryId);

@@ -1,5 +1,6 @@
 package webshopREST;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.annotation.security.DenyAll;
@@ -17,7 +18,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 
+import types.ErrorMessage;
 import types.User;
 import webshopREST.database.SingletonDatabase;
 import webshopREST.errors.DataNotFoundException;
@@ -27,12 +30,12 @@ import webshopREST.errors.DataNotFoundException;
  * Root resource (exposed at "users" path)
  */
 @Path("/users")
-@PermitAll
+@RolesAllowed("admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();
-	@Context
-	private WebshopSecurityContext securityContext;
+//	@Context
+//	private WebshopSecurityContext securityContext;
 
     @GET
     public Response getUsers() {
@@ -41,23 +44,27 @@ public class UserResource {
     }
     
     @GET
+    @RolesAllowed({"admin","user"})
     @Path("/{userId}")
-    @RolesAllowed("admin")
-    public Response getUser(@PathParam("userId") String userId) {
-    	System.out.println("getUser metodissa resourcessa");
-    	System.out.println("security " + securityContext);
-    	/* Ei toimi koska isUserRolea ei voi tehdä, securityContext on null
-    	 * Tämä GET-metodissa vain koska helppo testata
-    	if (!securityContext.isUserInRole("admin")){
-    		throw new DataNotFoundException("Not authorized");
+    public Response getUser(@PathParam("userId") String userId, @Context SecurityContext securityContext) {
+    	//Gives error if user requests someone else's data
+    	User requester = (User) securityContext.getUserPrincipal();
+    	if (!requester.getRoles().contains("admin")) {
+    		if (!requester.getId().equalsIgnoreCase(userId)) {
+    			return Response.status(Status.UNAUTHORIZED)
+    				.entity(new ErrorMessage("User cannot access other user's info.", 401, "http://myDocs.org"))
+    				.build();
     		}
-    		*/
+    	}
+    	
+    	System.out.println("getUser metodissa resourcessa");
     	User user = database.getUser(userId);
 		return Response.status(Status.OK).entity(user).build();
 		
     }
     
-    @POST
+    @POST    
+    @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(User user) {
 
@@ -68,6 +75,7 @@ public class UserResource {
     }
     
     @PUT
+    @RolesAllowed("admin")
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response replaceUser(@PathParam("userId") String userId, User user) {
@@ -82,12 +90,6 @@ public class UserResource {
     @RolesAllowed("admin")
     @Path("/{userId}")
     public Response removeUser(@PathParam("userId") String userId) {
-    	// Ei toimi koska isUserRolea ei voi tehdä, securityContext on null
-    	System.out.println("resource security: " + securityContext);
-    	if (!securityContext.isUserInRole("admin")){
-    		throw new DataNotFoundException("Not authorized");
-    		}
-    		
     	if (database.removeUser(userId)) {
 			return Response.status(Status.OK).entity("{}").build();
     	}

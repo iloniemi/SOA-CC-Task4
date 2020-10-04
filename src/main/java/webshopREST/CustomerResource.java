@@ -2,6 +2,7 @@ package webshopREST;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,6 +22,7 @@ import webshopREST.database.SingletonDatabase;
  * Root resource (exposed at "customers" path)
  */
 @Path("/customers")
+@RolesAllowed("admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class CustomerResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();

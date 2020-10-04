@@ -2,6 +2,8 @@ package webshopREST;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -19,12 +21,14 @@ import types.Product;
 import webshopREST.database.SingletonDatabase;
 
 @Path("/")
+@RolesAllowed("admin")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ProductResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();
 	
 	@GET
+	@PermitAll
 	public Response getProducts(@PathParam("categoryId") String categoryId, @QueryParam("manufacturer") String manufacturer) {
     	List<Product> products = database.getProducts(categoryId, manufacturer);
     	if (products != null) {
@@ -35,6 +39,7 @@ public class ProductResource {
 	}
 	
 	@GET
+	@PermitAll
 	@Path("/{productId}")
 	public Response getProduct(@PathParam("categoryId") String categoryId, @PathParam("productId") String productId) {
     	Product product = database.getProduct(categoryId, productId);
