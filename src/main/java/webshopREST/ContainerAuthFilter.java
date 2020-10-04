@@ -29,7 +29,8 @@ import javax.annotation.security.RolesAllowed;
 @Priority(Priorities.AUTHENTICATION)
 public class ContainerAuthFilter implements ContainerRequestFilter {
 	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
-	private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
+	private static final String AUTHORIZATION_HEADER_PREFIX_BASIC = "Basic ";
+	private static final String AUTHORIZATION_HEADER_PREFIX_JWT = "Bearer ";
 	private final SingletonDatabase database = SingletonDatabase.getDatabase();
 	
 	private static final ErrorMessage FORBIDDEN_ErrMESSAGE = new ErrorMessage("Access blockedfor all users !!!", 403, "http://myDocs.org");
@@ -44,10 +45,14 @@ public class ContainerAuthFilter implements ContainerRequestFilter {
 
 		User user = null;
 		List<String> authHeader = requestContext.getHeaders().get(AUTHORIZATION_HEADER_KEY);
-		//Basic authentication
+		String authToken = null;
 		if (authHeader != null && authHeader.size() > 0) {
-			String authToken = authHeader.get(0);
-			authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
+			authToken = authHeader.get(0);
+		}	
+		
+		//Basic authentication
+		if (authToken != null && authToken.startsWith(AUTHORIZATION_HEADER_PREFIX_BASIC)) {	
+			authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX_BASIC, "");
 			String decodedString = new String(Base64.getDecoder().decode(authToken));
 			System.out.println("decoded: " + decodedString);
 			if (decodedString.length() == 1) {
@@ -66,7 +71,12 @@ public class ContainerAuthFilter implements ContainerRequestFilter {
 			}
 		}
 		
-		//TODO:jwt authentication
+		//JWT authentication
+		if (authToken != null && authToken.startsWith(AUTHORIZATION_HEADER_PREFIX_JWT)) {	
+			authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX_JWT, "");
+			//TODO:tokenin dekoodaus ja vahvistus, userin ja securitycontextin asettaminen.
+		}
+		
 		
 		//Authorization
 		//Requested method annotations are checked first
@@ -86,7 +96,6 @@ public class ContainerAuthFilter implements ContainerRequestFilter {
 		    Response response = Response.status(Response.Status.UNAUTHORIZED).entity(UNAUTHORIZED_ErrMESSAGE).build();
 		    requestContext.abortWith(response);
 		}
-		
 		
 		//Annotations for the requested resource's class are checked next
 		Class<?> resClass = resourceInfo.getResourceClass();
