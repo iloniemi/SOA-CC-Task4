@@ -124,16 +124,14 @@ public class ContainerAuthFilter implements ContainerRequestFilter {
 		if (user == null) return false;
 		
 		//Ruma, mutta halusin kayttaa varmuuden vuoksi IgnoreCasea.
-		boolean rolesMatch = false;
 		for (String role: annotation.value()) {
 			for (String usersRole: user.getRoles()) {
 				if (usersRole.equalsIgnoreCase(role)) {
-					rolesMatch = true;
-					break;
+					return true;
 				}
 			}
 		}
-		return rolesMatch;
+		return false;
 	}
 				
 

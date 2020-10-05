@@ -1,5 +1,9 @@
 package webshopREST;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -23,17 +27,23 @@ import webshopREST.database.TokenService;
 
 
 @Path("/tokens")
-@PermitAll
+@RolesAllowed({"admin","user"})
 public class TokenResource {
 	private SingletonDatabase database = SingletonDatabase.getDatabase();
 	
 	//basic authilla tullaan tanne ja paastaan heti useriin kasiksi.
-	@POST
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
     public Response getToken(@Context SecurityContext securityContext) {
 		User user = (User) securityContext.getUserPrincipal();
 		
-		AuthenticationToken token = TokenService.getToken(user);
+		AuthenticationToken token = new AuthenticationToken();
+		try {
+			token = TokenService.getToken(user);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			Response.status(Status.INTERNAL_SERVER_ERROR).entity("{}").build();
+		}
+		
 		return Response.status(Status.OK).entity(token).build();
     }
 }
